@@ -4,4 +4,5 @@ __pycache__/
 venv/
 *.xlsx
 *.xls
+!data/SHUJU(1).xlsx
 baseline*.json
