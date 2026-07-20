@@ -21,9 +21,12 @@ import openpyxl
 
 
 STATION_LATITUDE_DEG = 36.7833
+STATION_ELEVATION_M = 3087.6
+METHOD_VERSION = "1.1-altitude-uvp"
 MISSING_SENTINEL = 999000.0
 SUNSHINE_TOLERANCE_HOURS = 0.05
 UVP_REFERENCE_MAX = 14.131644170491846
+UVP_ALTITUDE_INCREASE_PER_1000M = 0.10
 
 REQUIRED_HISTORY_COLUMNS = {
     "year": "年", "month": "月", "day": "日", "avg_temp": "平均气温",
@@ -45,6 +48,8 @@ class Baseline:
     reference_start: str
     reference_end: str
     valid_counts: dict[str, int]
+    station_elevation_m: float
+    uvp_altitude_factor: float
 
 
 def _number(value: Any) -> float | None:
@@ -102,6 +107,18 @@ def calculate_thi(avg_temp: float, avg_rh: float) -> float:
 
 def calculate_k(avg_temp: float, avg_wind: float, sunshine_hours: float) -> float:
     return -(10 * math.sqrt(avg_wind) + 10.45 - avg_wind) * (33 - avg_temp) + 8.55 * sunshine_hours
+
+
+def uvp_altitude_factor(elevation_m: float = STATION_ELEVATION_M) -> float:
+    """WHO approximate UV increase: 10% for each 1,000 m of elevation."""
+    return 1.0 + UVP_ALTITUDE_INCREASE_PER_1000M * elevation_m / 1000.0
+
+
+def calculate_uvp(target_date: date, sunshine_hours: float) -> tuple[float, float]:
+    """Return the unadjusted and altitude-adjusted local UVP values."""
+    _, noon_sine = solar_geometry(target_date)
+    unadjusted = 100.0 * sunshine_hours * noon_sine / UVP_REFERENCE_MAX
+    return unadjusted, unadjusted * uvp_altitude_factor()
 
 
 def thi_score_and_level(thi: float) -> tuple[int, str]:
@@ -203,8 +220,8 @@ def build_baseline(history_workbook: str | Path) -> Baseline:
         except InputError:
             sunshine = None
         if sunshine is not None:
-            _, noon_sine = solar_geometry(row_date)
-            uvps.append(100 * sunshine * noon_sine / UVP_REFERENCE_MAX)
+            _, uvp = calculate_uvp(row_date, sunshine)
+            uvps.append(uvp)
         if _valid(t, -80, 70) and _valid(wind, 0, 100) and sunshine is not None:
             k = calculate_k(t, wind, sunshine)
             k_values.append(k)
@@ -226,6 +243,8 @@ def build_baseline(history_workbook: str | Path) -> Baseline:
         reference_start=min(dates).isoformat(),
         reference_end=max(dates).isoformat(),
         valid_counts={"min_temp": len(min_temps), "wind_effect_k": len(k_values), "uvp": len(uvps), "clothing": len(clothing)},
+        station_elevation_m=STATION_ELEVATION_M,
+        uvp_altitude_factor=uvp_altitude_factor(),
     )
 
 
@@ -236,8 +255,7 @@ def calculate_indices(forecast: dict[str, Any], baseline: Baseline) -> dict[str,
     thi_score, thi_level = thi_score_and_level(thi)
     k = calculate_k(t, wind, sunshine)
     k_score, k_level = k_score_and_level(k)
-    _, noon_sine = solar_geometry(target_date)
-    uvp = 100 * sunshine * noon_sine / UVP_REFERENCE_MAX
+    uvp_unadjusted, uvp = calculate_uvp(target_date, sunshine)
     uvp_level = _five_level(uvp, baseline.uvp_thresholds, ("低暴露潜势", "较低暴露潜势", "中等暴露潜势", "较高暴露潜势", "高暴露潜势"))
     min_temp_rank, k_rank = _cold_rank(baseline.min_temp_values, tmin), _cold_rank(baseline.k_values, k)
     clothing = max(min_temp_rank, k_rank)
@@ -249,16 +267,27 @@ def calculate_indices(forecast: dict[str, Any], baseline: Baseline) -> dict[str,
         "status": "ok",
         "input": {"date": target_date.isoformat(), "avg_temp_c": t, "min_temp_c": tmin, "avg_rh_percent": rh, "avg_wind_mps": wind, "sunshine_hours": round(sunshine, 4)},
         "indices": {
-            "uvp": {"name_zh": "茶卡盐湖日照紫外暴露潜势指数", "value": round(uvp, 2), "level": uvp_level, "note": "该指标不是标准UVI。"},
+            "uvp": {
+                "name_zh": "茶卡盐湖日照紫外暴露潜势指数",
+                "value": round(uvp, 2),
+                "unadjusted_value": round(uvp_unadjusted, 2),
+                "altitude_factor": round(baseline.uvp_altitude_factor, 4),
+                "station_elevation_m": baseline.station_elevation_m,
+                "level": uvp_level,
+                "note": "已按海拔每1000米约增加10%的近似规则调整；该指标不是标准UVI。",
+            },
             "clothing": {"name_zh": "茶卡盐湖着装保温需求指数", "value": round(clothing, 2), "level": clothing_level, "min_temp_cold_rank": round(min_temp_rank, 2), "wind_effect_cold_rank": round(k_rank, 2)},
             "comfort": {"name_zh": "人体舒适度", "value": round(comfort, 2), "level": comfort_level, "max_deviation": deviation, "note": "表示未通过着装调整的原始天气舒适度。"},
             "thi": {"name_zh": "温湿度指数", "value": round(thi, 2), "score": thi_score, "level": thi_level},
             "wind_effect_k": {"name_zh": "风效指数", "value": round(k, 2), "score": k_score, "level": k_level},
         },
         "baseline": {
+            "method_version": METHOD_VERSION,
             "reference_period": f"{baseline.reference_start} to {baseline.reference_end}", "valid_counts": baseline.valid_counts,
             "uvp_thresholds": [round(value, 3) for value in baseline.uvp_thresholds],
             "clothing_thresholds": [round(value, 3) for value in baseline.clothing_thresholds],
+            "station_elevation_m": baseline.station_elevation_m,
+            "uvp_altitude_factor": round(baseline.uvp_altitude_factor, 4),
         },
     }
 
