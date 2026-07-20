@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1220" viewBox="0 0 2200 1220">
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#718096"/></marker></defs>
+<rect width="2200" height="1220" fill="#FFFFFF"/>
+<text x="70" y="82" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="600" fill="#17263A">茶卡盐湖旅游气象指数：两程序计算框架</text>
+<text x="70" y="124" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" fill="#607082">历史数据仅用于构建冻结基准；未来预报计算仅读取冻结基准 Excel，不重算历史分布</text>
+<rect x="60" y="175" width="2080" height="410" rx="18" fill="#F8FBFE" stroke="#C5D7E8" stroke-width="2"/>
+<rect x="60" y="650" width="2080" height="450" rx="18" fill="#F8FCFA" stroke="#C7DED3" stroke-width="2"/>
+<text x="100" y="220" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="29" font-weight="600" fill="#2B5D8A">程序一  历史基准构建（仅在更新历史数据或方法时运行）</text>
+<text x="100" y="695" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="29" font-weight="600" fill="#287753">程序二  未来逐日预报计算（每次输入未来气象数据时运行）</text>
+<rect x="120" y="285" width="280" height="230" rx="14" fill="#EAF2FF" stroke="#2B5D8A" stroke-width="2"/>
+<rect x="120" y="285" width="280" height="54" rx="14" fill="#2B5D8A"/>
+<rect x="120" y="327" width="280" height="12" fill="#2B5D8A"/>
+<text x="260" y="321" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">历史输入</text>
+<text x="260" y="397" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">茶卡国家基准气候站</text><text x="260" y="431" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">逐日历史工作簿</text><text x="260" y="465" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">SHUJU(1).xlsx</text>
+<rect x="500" y="285" width="280" height="230" rx="14" fill="#FFF4E5" stroke="#A85E0C" stroke-width="2"/>
+<rect x="500" y="285" width="280" height="54" rx="14" fill="#A85E0C"/>
+<rect x="500" y="327" width="280" height="12" fill="#A85E0C"/>
+<text x="640" y="321" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">字段与质量控制</text>
+<text x="640" y="397" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">字段映射</text><text x="640" y="431" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">999xxx 缺测剔除</text><text x="640" y="465" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">日照昼长校验</text>
+<rect x="880" y="285" width="280" height="230" rx="14" fill="#F1F5F9" stroke="#4E6278" stroke-width="2"/>
+<rect x="880" y="285" width="280" height="54" rx="14" fill="#4E6278"/>
+<rect x="880" y="327" width="280" height="12" fill="#4E6278"/>
+<text x="1020" y="321" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">历史计算</text>
+<text x="1020" y="397" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">计算 K、UVP</text><text x="1020" y="431" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">保留 Tmin 与 K 分布</text><text x="1020" y="465" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">计算 D 历史样本</text>
+<rect x="1260" y="285" width="280" height="230" rx="14" fill="#F1F5F9" stroke="#4E6278" stroke-width="2"/>
+<rect x="1260" y="285" width="280" height="54" rx="14" fill="#4E6278"/>
+<rect x="1260" y="327" width="280" height="12" fill="#4E6278"/>
+<text x="1400" y="321" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">阈值构建</text>
+<text x="1400" y="397" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">UVP：20/40/60/80%</text><text x="1400" y="431" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">D：20/40/60/80%</text><text x="1400" y="465" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">记录有效样本数</text>
+<rect x="1640" y="285" width="280" height="230" rx="14" fill="#E8F6EE" stroke="#287753" stroke-width="2"/>
+<rect x="1640" y="285" width="280" height="54" rx="14" fill="#287753"/>
+<rect x="1640" y="327" width="280" height="12" fill="#287753"/>
+<text x="1780" y="321" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">冻结基准 Excel</text>
+<text x="1780" y="397" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">Metadata</text><text x="1780" y="431" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">Thresholds</text><text x="1780" y="465" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">Distributions</text><text x="1780" y="499" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">Validation</text>
+<line x1="418" y1="390" x2="480" y2="390" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="798" y1="390" x2="860" y2="390" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1178" y1="390" x2="1240" y2="390" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1558" y1="390" x2="1620" y2="390" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="120" y="765" width="300" height="220" rx="14" fill="#EAF2FF" stroke="#2B5D8A" stroke-width="2"/>
+<rect x="120" y="765" width="300" height="54" rx="14" fill="#2B5D8A"/>
+<rect x="120" y="807" width="300" height="12" fill="#2B5D8A"/>
+<text x="270" y="801" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">未来预报输入</text>
+<text x="270" y="877" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">日期、平均/最低气温</text><text x="270" y="911" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">平均湿度、平均风速</text><text x="270" y="945" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">日照时数</text>
+<rect x="500" y="765" width="300" height="220" rx="14" fill="#FFF4E5" stroke="#A85E0C" stroke-width="2"/>
+<rect x="500" y="765" width="300" height="54" rx="14" fill="#A85E0C"/>
+<rect x="500" y="807" width="300" height="12" fill="#A85E0C"/>
+<text x="650" y="801" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">输入质量控制</text>
+<text x="650" y="877" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">同一字段口径</text><text x="650" y="911" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">范围与缺测检查</text><text x="650" y="945" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">日照昼长校验</text>
+<rect x="880" y="765" width="330" height="220" rx="14" fill="#E8F6EE" stroke="#287753" stroke-width="2"/>
+<rect x="880" y="765" width="330" height="54" rx="14" fill="#287753"/>
+<rect x="880" y="807" width="330" height="12" fill="#287753"/>
+<text x="1045" y="801" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">加载并校验基准</text>
+<text x="1045" y="877" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">读取基准 Excel</text><text x="1045" y="911" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">版本、站高、海拔因子</text><text x="1045" y="945" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">分布排序与样本数</text>
+<rect x="1290" y="765" width="350" height="220" rx="14" fill="#F1F5F9" stroke="#4E6278" stroke-width="2"/>
+<rect x="1290" y="765" width="350" height="54" rx="14" fill="#4E6278"/>
+<rect x="1290" y="807" width="350" height="12" fill="#4E6278"/>
+<text x="1465" y="801" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">五项指数计算</text>
+<text x="1465" y="877" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">THI：t、RH</text><text x="1465" y="911" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">K：t、V、S</text><text x="1465" y="945" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">UVP：日期、S、海拔因子</text><text x="1465" y="979" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">D：Tmin、K、历史分布</text><text x="1465" y="1013" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">C：THI_score、K_score</text>
+<rect x="1720" y="765" width="320" height="220" rx="14" fill="#E8F6EE" stroke="#287753" stroke-width="2"/>
+<rect x="1720" y="765" width="320" height="54" rx="14" fill="#287753"/>
+<rect x="1720" y="807" width="320" height="12" fill="#287753"/>
+<text x="1880" y="801" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#17263A">结果输出</text>
+<text x="1880" y="877" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">五项连续值与等级</text><text x="1880" y="911" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">D 的两个冷位次</text><text x="1880" y="945" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="400" fill="#17263A">基准版本与源文件哈希</text>
+<line x1="438" y1="875" x2="478" y2="875" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="818" y1="875" x2="858" y2="875" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1238" y1="875" x2="1268" y2="875" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1658" y1="875" x2="1698" y2="875" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1800" y1="495" x2="1045" y2="745" stroke="#718096" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#arrow)"/>
+<text x="1440" y="610" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" fill="#3C6E55">读取冻结基准（不读取原始历史数据）</text>
+<line x1="60" x2="2140" y1="1140" y2="1140" stroke="#D6DEE7" stroke-width="2"/>
+<text x="70" y="1185" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" fill="#607082">说明：程序一和程序二均调用相同的五项指数公式、质量控制和分级口径；仅数据读取职责被拆分。</text>
+</svg>

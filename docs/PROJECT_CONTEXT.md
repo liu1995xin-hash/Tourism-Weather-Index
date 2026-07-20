@@ -102,7 +102,9 @@
 
 | 路径 | 用途 |
 |---|---|
-| `src/tourism_indices.py` | 可运行的单日指数计算器，输出 JSON。 |
+| `src/tourism_indices.py` | 五项公式、质量控制、基准读写与计算的共享模块。 |
+| `src/build_baseline.py` | 程序一：从原始历史工作簿构建并冻结基准 Excel。 |
+| `src/calculate_indices.py` | 程序二：读取冻结基准 Excel 和一日预报，输出五项指数。 |
 | `examples/forecast.json` | 单日预报输入示例。 |
 | `requirements.txt` | 运行依赖。 |
 | `README.md` | 快速启动与项目概览。 |
@@ -111,18 +113,24 @@
 | `docs/LOGIC_REVIEW.md` | 历史试算证据、口径审查和潜在问题。 |
 | `docs/PROJECT_CONTEXT.md` | 本文件：需求、决定、原始资料和项目状态。 |
 | `data/SHUJU(1).xlsx` | 已授权上传的原始历史工作簿。 |
+| `data/baseline_tea_card_v1.xlsx` | 由当前原始历史工作簿构建出的冻结基准参数文件。 |
 | `sources/aksu-tourism-climate-index-paper.jpg` | 已授权上传的论文截图。 |
 
 ## 6. 当前实现状态
 
-`src/tourism_indices.py` 已通过以下验证：
+2026-07-20，用户确认将程序拆为“构建基准”和“预报计算”两部分。该重构不修改五项公式、质量控制、海拔规则或等级口径：
 
 ```powershell
-python -m py_compile .\src\tourism_indices.py
-python .\src\tourism_indices.py `
-  --history .\data\SHUJU(1).xlsx `
+python .\src\build_baseline.py `
+  --history ".\data\SHUJU(1).xlsx" `
+  --output .\data\baseline_tea_card_v1.xlsx
+
+python .\src\calculate_indices.py `
+  --baseline .\data\baseline_tea_card_v1.xlsx `
   --input-json .\examples\forecast.json
 ```
+
+第一程序将当前历史数据的分布、分位阈值、有效样本数、源文件 SHA-256 和方法参数写入基准 Excel；第二程序只读取该 Excel 与预报输入。基准 Excel 的 `Distributions` 表保留排序后的 `Tmin`、`K` 分布，因此 D 的连续经验冷位次规则不变。
 
 在当前原始历史文件与示例输入下，程序成功输出：UVP 88.96（高暴露潜势；未修正值 67.97，海拔因子 1.30876）、D 19.71（极低保温需求）、C 75（舒适）、THI 57.44（偏凉）、K -385.14（舒适）。
 
@@ -132,7 +140,7 @@ python .\src\tourism_indices.py `
 
 以下事项尚未完成，后续开发者不得把它们当作已解决：
 
-1. **冻结生产基准。** 现有代码每次从指定历史工作簿重算 D、UVP 分位数。研究阶段合理，但生产阶段会让阈值随新增数据变化。需明确基准期、导出 `baseline-v1`、记录文件哈希并在每个输出中返回版本号。
+1. **管理生产基准版本。** `baseline_tea_card_v1.xlsx` 已冻结当前历史期、记录源文件哈希并在计算结果中返回版本信息。后续仍需按业务规则明确新基准期的命名、审核与替换流程；不得静默覆盖既有基准文件。
 2. **批量接口与自动化测试。** 目前 CLI 计算一日。应支持多日 CSV/Excel/JSONL 输入，并在单个进程内复用同一个基准。测试需覆盖 9 档边界、999xxx、昼长、闰年和非法输入。
 3. **本地体验验证。** 尚无游客问卷、评价、客流、订单或投诉标签。获取这些资料后，验证 THI/K 边界、C 与体验的关系、D 与穿衣建议的可接受性。
 4. **旅游安全模块。** 若业务目标扩展为“综合旅游适宜度”，应单独确认降水、雷电、能见度、最大风速和其他风险规则，不能静默塞进现有 C。

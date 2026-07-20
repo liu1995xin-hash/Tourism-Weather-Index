@@ -2,7 +2,10 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+node_modules/
+.artifact-verify/
 *.xlsx
 *.xls
 !data/SHUJU(1).xlsx
+!data/baseline_tea_card_v1.xlsx
 baseline*.json

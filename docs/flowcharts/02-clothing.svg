@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#7B8794"/></marker></defs>
+<rect width="1600" height="1000" fill="#FFFFFF"/>
+<line x1="60" x2="1540" y1="170" y2="170" stroke="#D8E0E8" stroke-width="2"/>
+<text x="60" y="88" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="36" font-weight="600" fill="#182230">着装保温需求指数（D）</text>
+<text x="60" y="130" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" fill="#607082">全天出游的相对保温准备需求；不是衣物厚度或 clo</text>
+<line x1="331" x2="347" y1="385" y2="385" stroke="#7B8794" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="636" x2="652" y1="385" y2="385" stroke="#7B8794" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="941" x2="957" y1="385" y2="385" stroke="#7B8794" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1246" x2="1262" y1="385" y2="385" stroke="#7B8794" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="265" width="255" height="240" rx="14" fill="#EAF2FF" stroke="#3A6EA5" stroke-width="2"/>
+<rect x="60" y="265" width="255" height="54" rx="14" fill="#3A6EA5"/>
+<rect x="60" y="305" width="255" height="14" fill="#3A6EA5"/>
+<text x="187.5" y="301" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#182230">输入</text>
+<text x="187.5" y="369" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">最低气温 Tmin</text><text x="187.5" y="398" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">平均气温 t</text><text x="187.5" y="427" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">风速 V、日照 S</text>
+<rect x="365" y="265" width="255" height="240" rx="14" fill="#FFF4E5" stroke="#B66A16" stroke-width="2"/>
+<rect x="365" y="265" width="255" height="54" rx="14" fill="#B66A16"/>
+<rect x="365" y="305" width="255" height="14" fill="#B66A16"/>
+<text x="492.5" y="301" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#182230">质量控制</text>
+<text x="492.5" y="369" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">999xxx 缺测</text><text x="492.5" y="398" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">变量合理范围</text><text x="492.5" y="427" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">日照昼长校验</text>
+<rect x="670" y="265" width="255" height="240" rx="14" fill="#F1F5F9" stroke="#546274" stroke-width="2"/>
+<rect x="670" y="265" width="255" height="54" rx="14" fill="#546274"/>
+<rect x="670" y="305" width="255" height="14" fill="#546274"/>
+<text x="797.5" y="301" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#182230">风效计算</text>
+<text x="797.5" y="369" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">K=f(t, V, S)</text><text x="797.5" y="398" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">保留 Tmin</text><text x="797.5" y="427" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">使用质控后 S</text>
+<rect x="975" y="265" width="255" height="240" rx="14" fill="#F1F5F9" stroke="#546274" stroke-width="2"/>
+<rect x="975" y="265" width="255" height="54" rx="14" fill="#546274"/>
+<rect x="975" y="305" width="255" height="14" fill="#546274"/>
+<text x="1102.5" y="301" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#182230">历史冷位次</text>
+<text x="1102.5" y="369" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">Rmin=P(Tmin_hist≥Tmin)</text><text x="1102.5" y="398" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">RK=P(K_hist≥K)</text><text x="1102.5" y="427" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">D=max(Rmin, RK)</text>
+<rect x="1280" y="265" width="255" height="240" rx="14" fill="#E8F6EE" stroke="#2E7D5B" stroke-width="2"/>
+<rect x="1280" y="265" width="255" height="54" rx="14" fill="#2E7D5B"/>
+<rect x="1280" y="305" width="255" height="14" fill="#2E7D5B"/>
+<text x="1407.5" y="301" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="600" fill="#182230">分级输出</text>
+<text x="1407.5" y="369" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">历史 D 分位数</text><text x="1407.5" y="398" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">极低—高保温需求</text><text x="1407.5" y="427" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">输出两个冷位次</text>
+<rect x="60" y="585" width="1480" height="180" rx="14" fill="#F6F8FA" stroke="#D8E0E8" stroke-width="2"/>
+<text x="90" y="630" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="23" font-weight="600" fill="#182230">计算公式</text>
+<text x="90" y="672" font-family="Consolas, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">K=−(10×sqrt(V)+10.45−V)×(33−t)+8.55×S</text><text x="90" y="703" font-family="Consolas, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">Rmin=100×P(Tmin_hist≥Tmin)；RK=100×P(K_hist≥K)</text><text x="90" y="734" font-family="Consolas, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#182230">D=max(Rmin, RK)</text>
+<line x1="60" x2="1540" y1="850" y2="850" stroke="#D8E0E8" stroke-width="2"/>
+<circle cx="72" cy="905" r="8" fill="#3A6EA5"/><text x="88" y="912" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" fill="#48576A">输入</text>
+<circle cx="220" cy="905" r="8" fill="#B66A16"/><text x="236" y="912" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" fill="#48576A">质量控制</text>
+<circle cx="415" cy="905" r="8" fill="#546274"/><text x="431" y="912" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" fill="#48576A">计算与映射</text>
+<circle cx="635" cy="905" r="8" fill="#2E7D5B"/><text x="651" y="912" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" fill="#48576A">分级输出</text>
+<text x="1540" y="912" text-anchor="end" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" fill="#607082">逐日尺度 · ≥999000 为缺测 · 方法版本 v1.1</text>
+</svg>
