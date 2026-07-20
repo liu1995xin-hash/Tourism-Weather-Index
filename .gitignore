@@ -9,3 +9,8 @@ node_modules/
 !data/SHUJU(1).xlsx
 !data/baseline_tea_card_v1.xlsx
 baseline*.json
+build/
+dist/
+*.spec
+Lib/
+Scripts/
