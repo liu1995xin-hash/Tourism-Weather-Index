@@ -32,7 +32,7 @@ class TourismIndexApp(tk.Tk):
         self.title(APP_TITLE)
         self.geometry("1040x790")
         self.minsize(900, 660)
-        self.baseline_path = resource_path("data/baseline_tea_card_v1.xlsx")
+        self.baseline_path = resource_path("data/baseline_tea_card_v2.xlsx")
         self.baseline = None
         self.latest_result: dict | None = None
         self.spot_vars = {spot: tk.BooleanVar(value=(spot == "茶卡盐湖")) for spot in SCENIC_SPOTS}
@@ -53,7 +53,7 @@ class TourismIndexApp(tk.Tk):
         ttk.Label(main, text=APP_TITLE, style="Title.TLabel").grid(row=0, column=0, sticky="w")
         ttk.Label(
             main,
-            text="填写未来某日的逐日预报数据，系统将读取内置的茶卡盐湖历史基准并输出五项指数。",
+            text="填写未来某日的逐日预报数据，系统将读取内置的茶卡盐湖历史基准并输出五项指数及综合旅游气象指数。",
         ).grid(row=1, column=0, sticky="w", pady=(3, 14))
 
         input_frame = ttk.LabelFrame(main, text="预报输入", style="Section.TLabelframe", padding=14)

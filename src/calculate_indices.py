@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Program 2: calculate five indices from one forecast and a frozen baseline."""
+"""Program 2: calculate five indices and their composite from one forecast."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from tourism_indices import InputError, calculate_indices, load_baseline_xlsx, r
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Calculate five Tea Card tourism-weather indices from a forecast and frozen baseline."
+        description="Calculate five Tea Card tourism-weather indices and their composite from a forecast and frozen baseline."
     )
     parser.add_argument("--baseline", required=True, help="Frozen baseline .xlsx workbook")
     parser.add_argument("--input-json", help="UTF-8 JSON forecast object")

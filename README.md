@@ -1,6 +1,6 @@
 # 茶卡盐湖旅游气象指数
 
-本项目以茶卡国家基准气候站的逐日历史观测构建本地基准，再接收一日天气预报并输出五项旅游气象指数。
+本项目以茶卡国家基准气候站的逐日历史观测构建本地基准，再接收一日天气预报并输出五项旅游气象指数及其综合旅游气象指数。
 
 > 当前规则是第一版可运行口径。它只使用用户提供的历史气象工作簿和未来同口径预报字段，不接入外部数据。
 
@@ -21,6 +21,7 @@
 面向日常运行的完整命令、输入格式和常见操作见 [使用说明](docs/USAGE.md)。
 如需同时了解代码文件职责、程序运行方式和五项指标的计算逻辑，见 [代码使用与计算逻辑说明](docs/使用说明.md)。
 桌面界面程序与单文件 EXE 的使用和重新打包方法见 [界面程序说明](docs/GUI_EXE_USAGE.md)。
+五项指数合成为综合旅游气象指数的口径、权重与分级见 [综合指数说明](docs/COMPOSITE_INDEX.md)。
 
 ## 方法框架图
 
@@ -33,7 +34,7 @@
 | 文件 | 角色 | 是否直接运行 |
 |---|---|---|
 | `src/build_baseline.py` | 程序一：从历史气象工作簿构建、校验并写出冻结基准 Excel。 | 是；在历史数据或方法版本变化后运行。 |
-| `src/calculate_indices.py` | 程序二：读取冻结基准 Excel 与一日预报，输出五项指数 JSON。 | 是；每次需要计算预报时运行。 |
+| `src/calculate_indices.py` | 程序二：读取冻结基准 Excel 与一日预报，依次输出五项指数和综合旅游气象指数 JSON。 | 是；每次需要计算预报时运行。 |
 | `src/tourism_indices.py` | 共享规则库：公式、质量控制、分级、基准读写及校验。 | 否；由前两个程序调用。 |
 
 ## 安装
@@ -51,10 +52,10 @@ python -m pip install -r requirements.txt
 ```powershell
 python .\src\build_baseline.py `
   --history ".\data\SHUJU(1).xlsx" `
-  --output .\data\baseline_tea_card_v1.xlsx
+  --output .\data\baseline_tea_card_v2.xlsx
 ```
 
-基准 Excel 包含 `Metadata`、`Thresholds`、`Distributions`、`Validation` 四个工作表。`Distributions` 保存排序后的历史最低气温和 K 分布，以便 D 在任意未来连续输入值下仍可按原规则计算经验冷位次。
+基准 Excel 包含 `Metadata`、`Thresholds`、`Distributions`、`Validation` 四个工作表。`Distributions` 保存排序后的历史最低气温和 K 分布，以便 D 在任意未来连续输入值下仍可按原规则计算经验冷位次。`Thresholds` 还保存综合旅游气象指数的本地历史分位阈值。
 
 ### 2. 用冻结基准计算一日预报
 
@@ -62,7 +63,7 @@ python .\src\build_baseline.py `
 
 ```powershell
 python .\src\calculate_indices.py `
-  --baseline .\data\baseline_tea_card_v1.xlsx `
+  --baseline .\data\baseline_tea_card_v2.xlsx `
   --input-json .\examples\forecast.json
 ```
 
@@ -70,7 +71,7 @@ python .\src\calculate_indices.py `
 
 ```powershell
 python .\src\calculate_indices.py `
-  --baseline .\data\baseline_tea_card_v1.xlsx `
+  --baseline .\data\baseline_tea_card_v2.xlsx `
   --date 2026-07-20 `
   --avg-temp 14.0 `
   --min-temp 6.0 `
@@ -79,7 +80,7 @@ python .\src\calculate_indices.py `
   --sunshine-hours 10.0
 ```
 
-输出为 UTF-8 JSON，包含五项指数、分级、基础输入、基准期、分位数阈值和原始历史文件哈希。
+输出为 UTF-8 JSON，包含五项指数、综合旅游气象指数、分级、基础输入、基准期、分位数阈值和原始历史文件哈希。
 
 日常使用通常只需执行第 2 步；第 1 步仅在历史数据更新或计算口径更新后执行。详细的输入 JSON、输出解释和失败处理见 [使用说明](docs/USAGE.md)。
 
@@ -88,5 +89,5 @@ python .\src\calculate_indices.py `
 - 已授权上传的历史源数据位于 `data/SHUJU(1).xlsx`；只在构建基准时通过 `--history` 指定。
 - 所有 `>=999000` 的数值被视为缺测。
 - UVP 使用固定纬度 36.7833° 和固定站高 3087.6m；海拔仅用于 UVP 的近似修正，THI、K、C、D 不因海拔额外调整。
-- `data/baseline_tea_card_v1.xlsx` 是当前历史文件构建出的冻结基准。基准文件会校验结构版本、方法版本、站高与海拔因子；更新历史数据或口径后必须重新构建并升级版本。
+- `data/baseline_tea_card_v2.xlsx` 是当前历史文件构建出的冻结基准。它新增综合旅游气象指数的分位阈值；基准文件会校验结构版本、方法版本、站高与海拔因子，更新历史数据或口径后必须重新构建并升级版本。
 - 当前是逐日尺度；不能解释为某一具体小时的体感或辐射水平。

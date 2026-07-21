@@ -26,11 +26,12 @@ def main() -> None:
         result = {
             "status": "ok",
             "baseline_workbook": str(Path(args.output)),
-            "method_version": "1.1-altitude-uvp",
+            "method_version": "1.2-composite-index",
             "reference_period": f"{baseline.reference_start} to {baseline.reference_end}",
             "valid_counts": baseline.valid_counts,
             "uvp_thresholds": [round(value, 3) for value in baseline.uvp_thresholds],
             "clothing_thresholds": [round(value, 3) for value in baseline.clothing_thresholds],
+            "tourism_composite_thresholds": [round(value, 3) for value in baseline.composite_thresholds],
             "source_workbook_sha256": baseline.source_workbook_sha256,
         }
     except (InputError, OSError, openpyxl.utils.exceptions.InvalidFileException) as exc:

@@ -8,6 +8,7 @@ node_modules/
 *.xls
 !data/SHUJU(1).xlsx
 !data/baseline_tea_card_v1.xlsx
+!data/baseline_tea_card_v2.xlsx
 baseline*.json
 build/
 dist/

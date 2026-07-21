@@ -22,12 +22,12 @@ python -m pip install -r requirements.txt
 ### 输入与输出
 
 - 输入：原始历史工作簿，例如 `data/SHUJU(1).xlsx`；
-- 输出：冻结基准工作簿，例如 `data/baseline_tea_card_v1.xlsx`。
+- 输出：冻结基准工作簿，例如 `data/baseline_tea_card_v2.xlsx`。
 
 ```powershell
 python .\src\build_baseline.py `
   --history ".\data\SHUJU(1).xlsx" `
-  --output .\data\baseline_tea_card_v1.xlsx
+  --output .\data\baseline_tea_card_v2.xlsx
 ```
 
 成功时，终端输出 UTF-8 JSON，其中包含基准文件路径、方法版本、基准期、有效日数、UVP 与着装需求阈值，以及历史源文件的 SHA-256。
@@ -37,7 +37,7 @@ python .\src\build_baseline.py `
 | 工作表 | 保存内容 | 用途 |
 |---|---|---|
 | `Metadata` | 结构版本、方法版本、站点参数、源文件哈希、基准日期范围及固定质控参数 | 追溯和口径校验。 |
-| `Thresholds` | UVP、着装需求的 20%/40%/60%/80% 历史分位阈值 | 五级分段。 |
+| `Thresholds` | UVP、着装需求、综合旅游气象指数的 20%/40%/60%/80% 历史分位阈值 | UVP、着装需求和综合指数的五级分段。 |
 | `Distributions` | 升序的历史最低气温和风效指数 K | 计算着装需求的连续经验冷位次。 |
 | `Validation` | 各项构建时的有效日数 | 检查基准完整性。 |
 
@@ -79,7 +79,7 @@ python .\src\build_baseline.py `
 
 ```powershell
 python .\src\calculate_indices.py `
-  --baseline .\data\baseline_tea_card_v1.xlsx `
+  --baseline .\data\baseline_tea_card_v2.xlsx `
   --input-json .\examples\forecast.json
 ```
 
@@ -87,7 +87,7 @@ python .\src\calculate_indices.py `
 
 ```powershell
 python .\src\calculate_indices.py `
-  --baseline .\data\baseline_tea_card_v1.xlsx `
+  --baseline .\data\baseline_tea_card_v2.xlsx `
   --date 2026-07-20 `
   --avg-temp 14.0 `
   --min-temp 6.0 `
@@ -100,7 +100,7 @@ python .\src\calculate_indices.py `
 
 ## 4. 输出解释
 
-成功时输出 UTF-8 JSON，包括以下五项连续指数、等级和计算所用基准信息。
+成功时输出 UTF-8 JSON，包括以下五项连续指数、其后追加的综合旅游气象指数、等级和计算所用基准信息。
 
 | 输出键 | 含义 |
 |---|---|
@@ -109,8 +109,9 @@ python .\src\calculate_indices.py `
 | `comfort` | 未叠加着装调整的原始天气舒适度。 |
 | `thi` | 温湿度指数及九级分级。 |
 | `wind_effect_k` | 风效指数 K 及九级分级。 |
+| `tourism_composite` | 按五项输出加权得到的综合旅游气象指数，包含五项子得分、权重和本地历史分位等级。 |
 
-计算器还返回基准期、UVP 与着装需求阈值、站高、UVP 海拔因子和历史源文件哈希，便于追溯某次结果所用的基准。
+计算器还返回基准期、UVP、着装需求与综合旅游气象指数阈值、站高、UVP 海拔因子和历史源文件哈希，便于追溯某次结果所用的基准。
 
 ## 5. 日常运行顺序
 
@@ -121,7 +122,7 @@ python .\src\calculate_indices.py `
                       ↓
 每个预报日：运行 calculate_indices.py
                       ↓
-              输出五项旅游气象指数
+       输出五项旅游气象指数及综合旅游气象指数
 ```
 
 两个程序与五项公式的关系见 [总体方法框架图](flowcharts/00-two-program-workflow.png)。单项公式流程图见 [流程图目录](flowcharts/README.md)。

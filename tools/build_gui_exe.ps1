@@ -46,7 +46,7 @@ if (-not (Test-Path $env:TCL_LIBRARY) -or -not (Test-Path $env:TK_LIBRARY)) {
     --windowed `
     --optimize 2 `
     --name TeaCardTourismIndex `
-    --add-data "data\baseline_tea_card_v1.xlsx;data" `
+    --add-data "data\baseline_tea_card_v2.xlsx;data" `
     .\src\tourism_index_gui.py
 if ($LASTEXITCODE -ne 0) {
     throw "PyInstaller build failed."

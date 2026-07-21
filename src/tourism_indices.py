@@ -22,12 +22,20 @@ import openpyxl
 
 STATION_LATITUDE_DEG = 36.7833
 STATION_ELEVATION_M = 3087.6
-METHOD_VERSION = "1.1-altitude-uvp"
-BASELINE_SCHEMA_VERSION = "1.0"
+METHOD_VERSION = "1.2-composite-index"
+BASELINE_SCHEMA_VERSION = "1.1"
 MISSING_SENTINEL = 999000.0
 SUNSHINE_TOLERANCE_HOURS = 0.05
 UVP_REFERENCE_MAX = 14.131644170491846
 UVP_ALTITUDE_INCREASE_PER_1000M = 0.10
+COMPOSITE_WEIGHTS = {
+    "comfort": 0.35,
+    "thi": 0.15,
+    "wind_effect_k": 0.15,
+    "clothing": 0.20,
+    "uvp": 0.15,
+}
+UVP_COMPOSITE_SCORES = (50.0, 75.0, 100.0, 75.0, 50.0)
 
 REQUIRED_HISTORY_COLUMNS = {
     "year": "年", "month": "月", "day": "日", "avg_temp": "平均气温",
@@ -46,6 +54,7 @@ class Baseline:
     k_values: tuple[float, ...]
     uvp_thresholds: tuple[float, float, float, float]
     clothing_thresholds: tuple[float, float, float, float]
+    composite_thresholds: tuple[float, float, float, float]
     reference_start: str
     reference_end: str
     valid_counts: dict[str, int]
@@ -176,6 +185,44 @@ def _five_level(value: float, thresholds: tuple[float, float, float, float], lab
     return labels[-1]
 
 
+def _five_level_position(value: float, thresholds: tuple[float, float, float, float]) -> int:
+    """Return the zero-based five-level position defined by four thresholds."""
+    for position, threshold in enumerate(thresholds):
+        if value < threshold:
+            return position
+    return 4
+
+
+def thermal_subscore(direction_score: int) -> float:
+    """Map the agreed THI/K directional score to a 0-100 convenience score."""
+    return 100.0 - 12.5 * abs(direction_score)
+
+
+def uvp_composite_score(uvp: float, uvp_thresholds: tuple[float, float, float, float]) -> float:
+    """Use the agreed middle-is-best five-level UVP scoring rule."""
+    return UVP_COMPOSITE_SCORES[_five_level_position(uvp, uvp_thresholds)]
+
+
+def calculate_tourism_composite(
+    comfort: float,
+    thi_score: int,
+    k_score: int,
+    clothing: float,
+    uvp: float,
+    uvp_thresholds: tuple[float, float, float, float],
+) -> tuple[float, dict[str, float]]:
+    """Combine the five agreed index outputs into the tourism-weather composite."""
+    components = {
+        "comfort": comfort,
+        "thi": thermal_subscore(thi_score),
+        "wind_effect_k": thermal_subscore(k_score),
+        "clothing": 100.0 - clothing,
+        "uvp": uvp_composite_score(uvp, uvp_thresholds),
+    }
+    value = sum(COMPOSITE_WEIGHTS[name] * components[name] for name in COMPOSITE_WEIGHTS)
+    return value, components
+
+
 def _validate_forecast(forecast: dict[str, Any]) -> tuple[date, float, float, float, float, float]:
     fields = ("date", "avg_temp", "min_temp", "avg_rh", "avg_wind", "sunshine_hours")
     absent = [field for field in fields if field not in forecast]
@@ -210,6 +257,7 @@ def build_baseline(history_workbook: str | Path) -> Baseline:
     k_values: list[float] = []
     uvps: list[float] = []
     paired: list[tuple[float, float]] = []
+    complete_records: list[tuple[date, float, float, float, float, float, float]] = []
     dates: list[date] = []
     for row in worksheet.iter_rows(min_row=2, values_only=True):
         try:
@@ -223,6 +271,7 @@ def build_baseline(history_workbook: str | Path) -> Baseline:
         dates.append(row_date)
         t = _number(row[positions[REQUIRED_HISTORY_COLUMNS["avg_temp"]]])
         tmin = _number(row[positions[REQUIRED_HISTORY_COLUMNS["min_temp"]]])
+        rh = _number(row[positions[REQUIRED_HISTORY_COLUMNS["avg_rh"]]])
         wind = _number(row[positions[REQUIRED_HISTORY_COLUMNS["avg_wind"]]])
         sunshine = _number(row[positions[REQUIRED_HISTORY_COLUMNS["sunshine_hours"]]])
         if _valid(tmin, -80, 70):
@@ -239,7 +288,9 @@ def build_baseline(history_workbook: str | Path) -> Baseline:
             k_values.append(k)
             if _valid(tmin, -80, 70):
                 paired.append((tmin, k))
-    if not dates or not min_temps or not k_values or not uvps or not paired:
+                if _valid(rh, 0, 100):
+                    complete_records.append((row_date, t, tmin, rh, wind, sunshine, k))
+    if not dates or not min_temps or not k_values or not uvps or not paired or not complete_records:
         raise InputError("history workbook does not contain enough valid records")
 
     min_temps.sort()
@@ -247,14 +298,31 @@ def build_baseline(history_workbook: str | Path) -> Baseline:
     min_temp_ref, k_ref = tuple(min_temps), tuple(k_values)
     clothing = sorted(max(_cold_rank(min_temp_ref, tmin), _cold_rank(k_ref, k)) for tmin, k in paired)
     uvps.sort()
+    uvp_thresholds = tuple(_quantile(uvps, q) for q in (0.2, 0.4, 0.6, 0.8))
+    composite_values: list[float] = []
+    for row_date, t, tmin, rh, wind, sunshine, k in complete_records:
+        thi = calculate_thi(t, rh)
+        thi_score, _ = thi_score_and_level(thi)
+        k_score, _ = k_score_and_level(k)
+        comfort = 100.0 - 12.5 * max(abs(thi_score), abs(k_score))
+        _, uvp = calculate_uvp(row_date, sunshine)
+        clothing_value = max(_cold_rank(min_temp_ref, tmin), _cold_rank(k_ref, k))
+        composite, _ = calculate_tourism_composite(
+            comfort, thi_score, k_score, clothing_value, uvp, uvp_thresholds
+        )
+        composite_values.append(composite)
     return Baseline(
         min_temp_values=min_temp_ref,
         k_values=k_ref,
-        uvp_thresholds=tuple(_quantile(uvps, q) for q in (0.2, 0.4, 0.6, 0.8)),
+        uvp_thresholds=uvp_thresholds,
         clothing_thresholds=tuple(_quantile(clothing, q) for q in (0.2, 0.4, 0.6, 0.8)),
+        composite_thresholds=tuple(_quantile(sorted(composite_values), q) for q in (0.2, 0.4, 0.6, 0.8)),
         reference_start=min(dates).isoformat(),
         reference_end=max(dates).isoformat(),
-        valid_counts={"min_temp": len(min_temps), "wind_effect_k": len(k_values), "uvp": len(uvps), "clothing": len(clothing)},
+        valid_counts={
+            "min_temp": len(min_temps), "wind_effect_k": len(k_values), "uvp": len(uvps),
+            "clothing": len(clothing), "tourism_composite": len(composite_values),
+        },
         station_elevation_m=STATION_ELEVATION_M,
         uvp_altitude_factor=uvp_altitude_factor(),
         source_workbook_name=history_path.name,
@@ -300,6 +368,8 @@ def write_baseline_xlsx(baseline: Baseline, output_path: str | Path) -> None:
         ("missing_sentinel", MISSING_SENTINEL, "Values greater than or equal to this are missing"),
         ("sunshine_tolerance_hours", SUNSHINE_TOLERANCE_HOURS, "Allowed sunshine excess over theoretical day length"),
         ("uvp_reference_max", UVP_REFERENCE_MAX, "UVP solar-geometry normalization constant"),
+        ("composite_weights", json.dumps(COMPOSITE_WEIGHTS, ensure_ascii=False, sort_keys=True), "Weights for the five-output tourism-weather composite"),
+        ("uvp_composite_scores", ",".join(str(int(value)) for value in UVP_COMPOSITE_SCORES), "Middle-is-best scores for five UVP levels"),
     ]
     for row in metadata_rows:
         metadata.append(row)
@@ -310,11 +380,12 @@ def write_baseline_xlsx(baseline: Baseline, output_path: str | Path) -> None:
     for index_name, values, meaning in (
         ("uvp", baseline.uvp_thresholds, "Historical UVP cut point"),
         ("clothing", baseline.clothing_thresholds, "Historical clothing-demand cut point"),
+        ("tourism_composite", baseline.composite_thresholds, "Historical tourism-weather composite cut point"),
     ):
         for quantile, value in zip((0.2, 0.4, 0.6, 0.8), values):
             thresholds.append([index_name, quantile, value, meaning])
     _style_baseline_sheet(thresholds, (18, 14, 22, 42))
-    for row in thresholds.iter_rows(min_row=2, max_row=9, min_col=2, max_col=3):
+    for row in thresholds.iter_rows(min_row=2, max_row=thresholds.max_row, min_col=2, max_col=3):
         row[0].number_format = "0%"
         row[1].number_format = "0.000"
 
@@ -339,6 +410,7 @@ def write_baseline_xlsx(baseline: Baseline, output_path: str | Path) -> None:
         "wind_effect_k": "Valid K records after sunshine quality control",
         "uvp": "Valid UVP records after sunshine quality control",
         "clothing": "Records with both valid Tmin and K",
+        "tourism_composite": "Records with all five index inputs after quality control",
     }
     for metric, count in baseline.valid_counts.items():
         validation.append([metric, count, descriptions.get(metric, "")])
@@ -388,12 +460,21 @@ def load_baseline_xlsx(baseline_workbook: str | Path) -> Baseline:
         raise InputError("baseline workbook station elevation does not match the current method")
     if not math.isclose(altitude_factor, uvp_altitude_factor(), abs_tol=1e-9):
         raise InputError("baseline workbook UVP altitude factor does not match the current method")
+    try:
+        stored_weights = json.loads(str(_metadata_value(metadata, "composite_weights")))
+    except json.JSONDecodeError as exc:
+        raise InputError("baseline workbook composite weights are not valid JSON") from exc
+    if stored_weights != COMPOSITE_WEIGHTS:
+        raise InputError("baseline workbook composite weights do not match the current method")
+    expected_uvp_scores = ",".join(str(int(value)) for value in UVP_COMPOSITE_SCORES)
+    if str(_metadata_value(metadata, "uvp_composite_scores")) != expected_uvp_scores:
+        raise InputError("baseline workbook UVP composite scores do not match the current method")
     reference_start = str(_metadata_value(metadata, "reference_start"))
     reference_end = str(_metadata_value(metadata, "reference_end"))
     _parse_date(reference_start)
     _parse_date(reference_end)
 
-    threshold_values: dict[str, dict[float, float]] = {"uvp": {}, "clothing": {}}
+    threshold_values: dict[str, dict[float, float]] = {"uvp": {}, "clothing": {}, "tourism_composite": {}}
     for index_name, quantile, value, *_ in workbook["Thresholds"].iter_rows(min_row=2, values_only=True):
         if index_name is None:
             continue
@@ -421,7 +502,7 @@ def load_baseline_xlsx(baseline_workbook: str | Path) -> Baseline:
         for metric, count, *_ in workbook["Validation"].iter_rows(min_row=2, values_only=True)
         if metric is not None and count is not None
     }
-    required_counts = ("min_temp", "wind_effect_k", "uvp", "clothing")
+    required_counts = ("min_temp", "wind_effect_k", "uvp", "clothing", "tourism_composite")
     if any(metric not in valid_counts or valid_counts[metric] <= 0 for metric in required_counts):
         raise InputError("baseline workbook validation counts are incomplete")
     if valid_counts["min_temp"] != len(min_temp_values) or valid_counts["wind_effect_k"] != len(k_values):
@@ -432,6 +513,7 @@ def load_baseline_xlsx(baseline_workbook: str | Path) -> Baseline:
         k_values=tuple(k_values),
         uvp_thresholds=tuple(threshold_values["uvp"][quantile] for quantile in expected_quantiles),
         clothing_thresholds=tuple(threshold_values["clothing"][quantile] for quantile in expected_quantiles),
+        composite_thresholds=tuple(threshold_values["tourism_composite"][quantile] for quantile in expected_quantiles),
         reference_start=reference_start,
         reference_end=reference_end,
         valid_counts=valid_counts,
@@ -443,7 +525,7 @@ def load_baseline_xlsx(baseline_workbook: str | Path) -> Baseline:
 
 
 def calculate_indices(forecast: dict[str, Any], baseline: Baseline) -> dict[str, Any]:
-    """Return the five agreed daily indices for one forecast record."""
+    """Return the five daily indices and their agreed tourism-weather composite."""
     target_date, t, tmin, rh, wind, sunshine = _validate_forecast(forecast)
     thi = calculate_thi(t, rh)
     thi_score, thi_level = thi_score_and_level(thi)
@@ -457,6 +539,14 @@ def calculate_indices(forecast: dict[str, Any], baseline: Baseline) -> dict[str,
     deviation = max(abs(thi_score), abs(k_score))
     comfort = 100.0 - 12.5 * deviation
     comfort_level = {100.0: "舒适", 75.0: "舒适", 50.0: "基本舒适", 25.0: "较不舒适", 0.0: "不舒适"}[comfort]
+    tourism_composite, composite_components = calculate_tourism_composite(
+        comfort, thi_score, k_score, clothing, uvp, baseline.uvp_thresholds
+    )
+    tourism_composite_level = _five_level(
+        tourism_composite,
+        baseline.composite_thresholds,
+        ("极低", "较低", "中等", "较高", "高"),
+    )
     return {
         "status": "ok",
         "input": {"date": target_date.isoformat(), "avg_temp_c": t, "min_temp_c": tmin, "avg_rh_percent": rh, "avg_wind_mps": wind, "sunshine_hours": round(sunshine, 4)},
@@ -474,12 +564,21 @@ def calculate_indices(forecast: dict[str, Any], baseline: Baseline) -> dict[str,
             "comfort": {"name_zh": "人体舒适度", "value": round(comfort, 2), "level": comfort_level, "max_deviation": deviation, "note": "表示未通过着装调整的原始天气舒适度。"},
             "thi": {"name_zh": "温湿度指数", "value": round(thi, 2), "score": thi_score, "level": thi_level},
             "wind_effect_k": {"name_zh": "风效指数", "value": round(k, 2), "score": k_score, "level": k_level},
+            "tourism_composite": {
+                "name_zh": "茶卡盐湖综合旅游气象指数",
+                "value": round(tourism_composite, 2),
+                "level": tourism_composite_level,
+                "component_scores": {name: round(value, 2) for name, value in composite_components.items()},
+                "weights": COMPOSITE_WEIGHTS,
+                "note": "按五项指数的已确认权重合成；THI、K 的重复影响通过较低权重保留。UVP 采用中等最佳评分。该指标不含旅游安全风险模块。",
+            },
         },
         "baseline": {
             "method_version": METHOD_VERSION,
             "reference_period": f"{baseline.reference_start} to {baseline.reference_end}", "valid_counts": baseline.valid_counts,
             "uvp_thresholds": [round(value, 3) for value in baseline.uvp_thresholds],
             "clothing_thresholds": [round(value, 3) for value in baseline.clothing_thresholds],
+            "tourism_composite_thresholds": [round(value, 3) for value in baseline.composite_thresholds],
             "station_elevation_m": baseline.station_elevation_m,
             "uvp_altitude_factor": round(baseline.uvp_altitude_factor, 4),
             "source_workbook_name": baseline.source_workbook_name,
