@@ -156,3 +156,9 @@ python .\src\calculate_indices.py `
 3. 使用本仓库原始工作簿重跑历史有效样本数与示例回归检查；
 4. 更新 `docs/LOGIC_REVIEW.md` 的证据和风险判断；
 5. 不修改 UVP、D、C 的已确认语义，除非需求方明确批准新的业务定义。
+
+## 9. 2026-10-19 接手资料补充
+
+本次仅补充说明与接手入口，不调整计算代码、历史数据或冻结基准。新增 `docs/METHODOLOGY_SPECIFICATION.md`，将当前计算口径、完整精度和分级边界规范化；新增 `docs/AGENT_ONBOARDING.md`，集中说明阅读顺序、已确认决策、两程序分工、复现命令、样例结果和未完成事项；根目录 `AGENTS.md` 为后续代理提供自动可发现的阅读入口。
+
+本次核验远端功能分支为 `agent/add-index-flow-diagrams`，既有功能提交为 `7afc46a`，PR #1 仍为未合并草稿。默认分支是 `agent/tea-card-tourism-indices`。接手应检出功能分支，不应假设默认分支已经包含最新功能。具体分支和 PR 状态会变化，后续仍须实时核验。

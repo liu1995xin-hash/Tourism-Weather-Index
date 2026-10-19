@@ -4,6 +4,12 @@
 
 > 当前规则是第一版可运行口径。它只使用用户提供的历史气象工作簿和未来同口径预报字段，不接入外部数据。
 
+## 接手开发入口
+
+下一位开发者或大模型请先阅读 [接手指南](docs/AGENT_ONBOARDING.md)，再阅读 [详细方法说明](docs/METHODOLOGY_SPECIFICATION.md)。接手指南包含已确认决策、代码入口、基准版本、复现命令、预期结果和待办事项。
+
+当前完整实现位于 `agent/add-index-flow-diagrams` 分支，对应 [PR #1](https://github.com/liu1995xin-hash/Tourism-Weather-Index/pull/1)。截至 2026-10-19，该 PR 仍为未合并的草稿；直接检出默认分支会缺少本分支的后续功能。
+
 ## 五项输出
 
 | 输出键 | 指数 | 含义 |
